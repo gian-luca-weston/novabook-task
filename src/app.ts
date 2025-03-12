@@ -1,10 +1,10 @@
 import express from "express";
+import transactionRoutes from './routes/transactionRoute'
 
 const app = express()
+
 app.use(express.json())
 
-app.get("/", (req, res) => {
-    res.send("novabook service live")
-})
+app.use(transactionRoutes)
 
 export default app;
