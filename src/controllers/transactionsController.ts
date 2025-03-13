@@ -2,10 +2,10 @@ import { Request, Response } from "express"
 import { processTransaction } from "../services/transactionService"
 import logger from "../utils/logger"
 
-export const ingestTransaction = (req: Request, res: Response) => {
+export const ingestTransaction = async (req: Request, res: Response) => {
     try {
         const transaction = req.body
-        processTransaction(transaction)
+        await processTransaction(transaction)
         logger.info(`Transaction received: ${JSON.stringify(transaction)}`)
         res.status(202).send()
     } catch (error) {

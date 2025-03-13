@@ -1,26 +1,27 @@
-import storageService from "./storageService"
+import prisma from "./dbService"
 import { SaleAmendment, SaleEvent, Transaction } from "../models/transactions"
 import logger from "../utils/logger"
 
-export const processAmendment = (amendment: SaleAmendment): void => {
+export const processAmendment = async (amendment: SaleAmendment): Promise<void> => {
     logger.info(`Storing amendment: ${JSON.stringify(amendment)}`)
-    storageService.addAmendment(amendment)
+    await prisma.saleAmendment.create({ data: amendment })
 
-    const transactions = storageService.getTransactions()
+    const sale = await prisma.transaction.findFirst({
+        where: { eventType: "SALES", invoiceId: amendment.invoiceId },
+    });
 
-    const sale = transactions.find(
-        (t) => t.eventType === "SALES" && t.invoiceId === amendment.invoiceId
-    ) as SaleEvent | undefined
+    if (sale && sale.items) {
+        const updatedItems = sale.items.map((item: any) =>
+            item.itemId === amendment.itemId ? { ...item, cost: amendment.cost, taxRate: amendment.taxRate } : item
+        );
 
-    if(sale) {
-        const item = sale.items.find((i) => i.itemId === amendment.itemId)
+        await prisma.transaction.update({
+            where: { id: sale.id },
+            data: { items: updatedItems },
+        });
         
-        if(item) {
-            logger.info(`Applying amendment to item ${amendment.itemId} in invoice ${amendment.invoiceId}`)
-            item.cost = amendment.cost
-            item.taxRate = amendment.taxRate
-        } else {
-            logger.warn(`Item ${amendment.itemId} not found in invoice ${amendment.invoiceId}`)
-        }
+        logger.info(`Applied amendment to invoice ${amendment.invoiceId}`)
+    } else {
+        logger.warn(`Sale not found for invoice ${amendment.invoiceId}`)
     }
 }

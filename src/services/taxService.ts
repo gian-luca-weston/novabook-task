@@ -1,11 +1,13 @@
-import storageService from "./storageService"
+import prisma from "./dbService"
 import { Transaction, SaleEvent, TaxPaymentEvent } from "../models/transactions"
 import logger from "../utils/logger"
 
-export const calculateTaxPosition = (date: string): number => {
+export const calculateTaxPosition = async (date: string): Promise<number> => {
     logger.info(`Calculating tax position for ${date}`)
 
-    const transactions: Transaction[] = storageService.getTransactions()
+    const transactions: Transaction[] = await prisma.transaction.findMany({
+        where: { date: { lte: new Date(date) } },
+    })
     let totalTaxOwed = 0
     let totalTaxPaid = 0
 

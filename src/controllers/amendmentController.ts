@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { processAmendment } from "../services/amendmentService"
 import logger from "../utils/logger"
 
-export const amendSale = (req: Request, res: Response): void => {
+export const amendSale = async (req: Request, res: Response): Promise<void> => {
   try {
     const amendment = req.body
 
@@ -13,7 +13,7 @@ export const amendSale = (req: Request, res: Response): void => {
     }
 
     logger.info(`Processing amendment: ${JSON.stringify(amendment)}`)
-    processAmendment(amendment)
+    await processAmendment(amendment)
     res.status(202).send()
   } catch (error) {
     logger.error(`Amendment error: ${error instanceof Error ? error.message : "Unknown error"}`)

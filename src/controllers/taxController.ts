@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { calculateTaxPosition } from "../services/taxService"
 import logger from "../utils/logger"
 
-export const getTaxPosition = (req: Request, res: Response): void => {
+export const getTaxPosition = async (req: Request, res: Response): Promise<void> => {
     try {
         const date = req.query.date as string
 
@@ -11,7 +11,7 @@ export const getTaxPosition = (req: Request, res: Response): void => {
             res.status(400).json({ error: "Missing required query parameter: date" })
         }
         
-        const taxPosition = calculateTaxPosition(date)
+        const taxPosition = await calculateTaxPosition(date)
         logger.info(`Calculated tax position for ${date}: ${taxPosition}`)
         res.status(200).json({ date, taxPosition })
     } catch (error) {
