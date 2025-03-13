@@ -15,5 +15,13 @@ export interface TaxPaymentEvent {
     amount: number
 }
 
+export interface SaleAmendment {
+    date: string;         
+    invoiceId: string;    
+    itemId: string;
+    cost: number;
+    taxRate: number; 
+}
+
 
 export type Transaction = SaleEvent | TaxPaymentEvent
