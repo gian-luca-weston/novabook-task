@@ -1,22 +1,21 @@
 import { Request, Response } from "express"
 import { calculateTaxPosition } from "../services/taxService"
+import logger from "../utils/logger"
 
 export const getTaxPosition = (req: Request, res: Response): void => {
     try {
         const date = req.query.date as string
 
         if(!date) {
+            logger.warn("Tax position query missing date parameter");
             res.status(400).json({ error: "Missing required query parameter: date" })
         }
-
+        
         const taxPosition = calculateTaxPosition(date)
+        logger.info(`Calculated tax position for ${date}: ${taxPosition}`)
         res.status(200).json({ date, taxPosition })
-
     } catch (error) {
-        if (error instanceof Error) {
-            res.status(500).json({ error: error.message })
-        } else {
-            res.status(500).json({ error: "An unexpected error occured" })
-        }
-    }
+        logger.error(`Tax position error: ${error instanceof Error ? error.message : "Unknown error"}`);
+        res.status(500).json({ error: error instanceof Error ? error.message : "An unexpected error occurred" });
+      }
 }

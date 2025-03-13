@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/gian-luca-weston/novabook-task#readme",
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

@@ -1,7 +1,9 @@
 import storageService from "./storageService"
 import { SaleAmendment, SaleEvent, Transaction } from "../models/transactions"
+import logger from "../utils/logger"
 
 export const processAmendment = (amendment: SaleAmendment): void => {
+    logger.info(`Storing amendment: ${JSON.stringify(amendment)}`)
     storageService.addAmendment(amendment)
 
     const transactions = storageService.getTransactions()
@@ -14,10 +16,11 @@ export const processAmendment = (amendment: SaleAmendment): void => {
         const item = sale.items.find((i) => i.itemId === amendment.itemId)
         
         if(item) {
+            logger.info(`Applying amendment to item ${amendment.itemId} in invoice ${amendment.invoiceId}`)
             item.cost = amendment.cost
             item.taxRate = amendment.taxRate
         } else {
-            console.log(`Item ${amendment.itemId} not found in the invoice ${amendment.invoiceId}`)
+            logger.warn(`Item ${amendment.itemId} not found in invoice ${amendment.invoiceId}`)
         }
     }
 }
