@@ -1,10 +1,12 @@
 import express from "express";
-import transactionRoutes from './routes/transactionRoute'
+import transactionRoute from './routes/transactionRoute'
+import taxRoute from './routes/taxRoute'
 
 const app = express()
 
 app.use(express.json())
 
-app.use(transactionRoutes)
+app.use(transactionRoute)
+app.use(taxRoute)
 
 export default app;
