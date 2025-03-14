@@ -4,7 +4,7 @@
   "description": "A techincal task for a mock tax service",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand --detectOpenHandles",
+    "test": "jest --coverage --runInBand --detectOpenHandles",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc"
