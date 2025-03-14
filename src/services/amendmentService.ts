@@ -8,10 +8,27 @@ export const processAmendment = async (amendment: SaleAmendment): Promise<void> 
 
     const sale = await prisma.transaction.findFirst({
         where: { eventType: "SALES", invoiceId: amendment.invoiceId },
-    });
+        select: { id: true, items: true }
+    })
 
     if (sale && sale.items) {
-        const updatedItems = sale.items.map((item: any) =>
+        let parsedItems: SaleEvent["items"]
+
+        if (Array.isArray(sale.items)) {
+            parsedItems = sale.items as SaleEvent["items"]
+        } else if (typeof sale.items === "string") {
+            try {
+                parsedItems = JSON.parse(sale.items) as SaleEvent["items"]
+            } catch (error) {
+                logger.error(`Failed to parse items JSON: ${sale.items}`)
+                return
+            }
+        } else {
+            logger.error(`Unexpected items format: ${typeof sale.items}`)
+            return
+        }
+
+        const updatedItems = parsedItems.map((item: any) =>
             item.itemId === amendment.itemId ? { ...item, cost: amendment.cost, taxRate: amendment.taxRate } : item
         );
 
